@@ -96,7 +96,7 @@ class course extends connection implements IModel{
         description = :DESCRIPTION,
         dateStart = :DATE_START, 
         dateFinish = :DATE_FINISH, 
-        status = :STATUS,
+        status = :STATUS
         WHERE id = :ID ";
 
         $stmt = $this->conn->prepare($sql);

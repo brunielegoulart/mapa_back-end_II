@@ -1,12 +1,15 @@
 <?php
 
-require_once('Model/course.php');
+require_once('Model/student.php');
 
-$course = new course();
-$result = $course->search(array('STATUS' => 1, ':NAME' => '%php%'));
+$student = new student();
+$result = $student->find(1);
+$student->setName("José Andrei Oliveira");
+$student->save();
+
 ?>
 
 <pre>
-    <?php print_r($result); ?>
+    <?php print_r($student->getName()); ?>
 </pre>
 
