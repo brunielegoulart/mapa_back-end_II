@@ -1,15 +1,23 @@
 <?php
 
-require_once('Model/student.php');
 
-$student = new student();
-$result = $student->find(1);
-$student->setName("José Andrei Oliveira");
-$student->save();
+function loadController($nameController, $nameFunction = "index")
+{
+    $nameController .= "controller";
+    require_once('Controllers/'.$nameController.'.php');
 
-?>
+    $controller = new $nameController();
+    $controller->$nameFunction();
+}
 
-<pre>
-    <?php print_r($student->getName()); ?>
-</pre>
 
+if(isset($_GET['c'])){
+    $nameController = $_GET['c'];
+
+    if(isset($_GET['f']))
+       loadController($nameController, $_GET['f']);
+    else
+        loadController($nameController);
+}else{
+    loadController('course');
+}
