@@ -19,11 +19,13 @@ class student extends connection implements IModel
         $updatedAt;
 
     private $table;
+    private $parentTable;
 
     public function __construct()
     {
         $this->conn = $this->getConnection();
         $this->table = "student";
+        $this->parentTable = "course";
     }
 
     public function fill($data)
@@ -35,25 +37,31 @@ class student extends connection implements IModel
         $this->phone = $data['phone'];
         $this->course= $data['course'];
         $this->status = $data['status'];
-        $this->createdAt = $data['createdAt'];
-        $this->updatedAt = $data['updatedAt'];
+        $this->createdAt = $data['created_at'];
+        $this->updatedAt = $data['updated_at'];
     }
 
     public function findAll()
     {
-        $sql ="SELECT * FROM ".$this->table." ORDER BY name ASC";
+        $sql ="SELECT ".$this->table.".*, course.nameCourse 
+        FROM ".$this->table." 
+        INNER JOIN ".$this->parentTable." ON(".$this->table.".course = ".$this->parentTable.".id) 
+        ORDER BY name ASC";
+
         $stmt = $this->conn->prepare($sql);
-        $result = $this->conn->query($sql);
+
         $stmt->execute();
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
         return $result;
     }
 
     public function find($id)
     {
-        $sql = " SELECT * FROM ".$this->table." WHERE id=:ID";
+        $sql = " SELECT * FROM ".$this->table. " WHERE id=:ID ";
         $stmt = $this->conn->prepare($sql);
-        $result = $stmt->execute(array(':ID' => $id));
+        $stmt->execute(array(':ID' => $id));
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         if(count($result) > 0){
@@ -65,11 +73,28 @@ class student extends connection implements IModel
 
     public function search($data)
     {
-        $sql = " SELECT * FROM ".$this->table." WHERE course = :COURSE AND name LIKE  :NAME ";
-         $stmt = $this->conn->prepare($sql);
-         $stmt->execute($data);
-         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-         return $result;
+        $sql = " SELECT * FROM ".$this->table.
+        " INNER JOIN ".$this->parentTable." ON(".$this->table.".course = ".$this->parentTable.".id) WHERE 1 ";
+
+        if($data[':COURSE'] < 0)
+            $sql .= "AND course = :COURSE ";
+        else
+            unset($data[':COURSE']);
+
+        if(strlen($data[':NAME']) > 2)
+            $sql .= "AND name LIKE :NAME ";
+        else
+            unset($data[':NAME']);
+
+        $sql .= " ORDER BY name ASC ";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute($data);
+
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+        return $result;
     }
 
     public function save()

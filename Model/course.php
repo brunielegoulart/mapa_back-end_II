@@ -60,9 +60,9 @@ class course extends connection implements IModel{
     public function save()
     {
         if($this->id > 0){
-            $this->update();
+            return $this->update();
         }else{
-            $this->insert();
+            return $this->insert();
         }
     }
 
@@ -107,7 +107,7 @@ class course extends connection implements IModel{
             ':DATE_START'  => $this->dateStart,
             ':DATE_FINISH' => $this->dateFinish,
             ':STATUS'      => $this->status,
-            ':ID '         => $this->id 
+            ':ID'         => $this->id 
         ));
 
         if($stmt->rowCount() > 0)
@@ -127,6 +127,11 @@ class course extends connection implements IModel{
         else
             return false;
 
+    }
+
+    public function setId($id)
+    {
+        $this->id = $id;
     }
 
     public function setNameCourse($name)
